@@ -30,16 +30,19 @@ router.post("/login", async (req, res) => {
 
 // add berita
 router.post("/broadcast/addImage" , (req, res) => {
+
+
 	if (!req.files) {
 		return res.status(500).send({ msg: "file is not found" });
 	}
 
 	const myFile = req.files.file;
-	myFile.mv(`${__dirname}/public/${myFile.name}`, function (err) {
+	myFile.mv(`${__dirname}/../../public/${myFile.name}`, function (err) {
 		if (err) {
 			console.log(err);
 			return res.status(500).send({ msg: "Error occured" });
 		}
+
 		return res.send({
 			status: true,
 			name: myFile.name,
@@ -55,21 +58,20 @@ router.post("/broadcast/addNews", isAuth , (req, res) => {
 		isiText: req.body.isiText,
 		imgUrl: req.body.imgUrl,
 	};
-
 	const news = new News({
-		judul: data.judul,
-		isiText: data.isiText,
-		imgUrl: data.imgUrl,
+		title: data.judul,
+		content: data.isiText,
+		imageUrl: data.imgUrl,
 	});
-
 	news.save();
-
-
 	res.send({ msg: "succes" });
 });
 
 router.get("/broadcast/allData", (req, res) => {
-	let news = News.find().then((result) => res.send(result));
+	let news = News.find({}, (err,newsDB)=> {
+		res.status(200).send(newsDB);
+	})
+
 });
 
 // call-us from website
