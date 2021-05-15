@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const jwt = require("jsonwebtoken");
 const isAuth = require('./../../midleware/auth')
 
 // models
@@ -7,30 +6,14 @@ const News = require("./../../models/mongodb/news");
 const User = require("./../../models/mongodb/users");
 const CallUs = require("./../../models/mongodb/call_us");
 
+// controller
+const authController = require('./../../controller/api/auth');
+
 // login
-router.post("/login", async (req, res) => {
-	let user = await User.find({
-		username: req.body.username,
-		password: req.body.password,
-	}); // check ke mongodb
-
-	console.log(user[0].username);
-
-	if (!user) {
-		return res.status(500).json({msg:'user unknow'});
-	};
-
-	const token = jwt.sign(
-		{ id: user.id, username: user.username },
-		process.env.JWTTOKEN
-	);
-
-	res.status(200).json({ login: true, msg:'success', token: token, username: user[0].username });
-});
+router.post("/login", authController.login );
 
 // add berita
 router.post("/broadcast/addImage" , (req, res) => {
-
 
 	if (!req.files) {
 		return res.status(500).send({ msg: "file is not found" });
@@ -71,7 +54,6 @@ router.get("/broadcast/allData", (req, res) => {
 	let news = News.find({}, (err,newsDB)=> {
 		res.status(200).send(newsDB);
 	})
-
 });
 
 // call-us from website
